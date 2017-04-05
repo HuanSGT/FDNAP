@@ -108,6 +108,15 @@ struct network {
         return ret;
     }
 
+    PII get_size() {
+        ll v = 0, e = 0;
+        for (ll i = 1; i <= n; ++ i) if (fa[i] == i) {
+            ++ v;
+            e += deg[i];
+        }
+        return {v, e};
+    }
+
     void print() {
         ll v = 0, e = 0;
         puts("degree distribution:");
@@ -119,5 +128,42 @@ struct network {
         }
         printf("|V| = %lld, 2|E| = %lld\n",v,e);
         puts("");
+    }
+
+    ll mds = n, way;
+    bool in_ds[maxn];
+
+    PII get_mds(ll lower_bound = maxn) {
+        mds = lower_bound; way = 0;
+        for (ll i = 1; i <= n; ++i) in_ds[i] = false;
+        dfs_mds(1,0);
+        return {mds, way};
+    }
+
+    void dfs_mds(ll i,ll tot) {
+        if (tot > mds) return;
+        if (i > n) {
+            for (ll i = 1; i <= n; ++i) if (fa[i] == i && !in_ds[i]) {
+                bool flag = false;
+                for (ll j : nbr[i]) if (in_ds[j]) {
+                    flag = true;
+                    break;
+                }
+                if (!flag) return;
+            }
+            //printf("DS: "); for (ll i = 1; i <= n; ++i) if (in_ds[i]) printf("%lld ",i); puts("");
+            if (tot < mds) { mds = tot; way = 1; }
+            else if (tot == mds) { ++ way; }
+            return;
+        }
+        if (fa[i] != i) {
+            dfs_mds(i + 1, tot);
+            return;
+        }
+        dfs_mds(i + 1, tot);
+
+        in_ds[i] = true;
+        dfs_mds(i + 1, tot + 1);
+        in_ds[i] = false;
     }
 };

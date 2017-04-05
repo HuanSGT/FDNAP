@@ -7,8 +7,8 @@
 network<1000> dual(1,{}, {1,1,1});
 
 int main() {
-    freopen("dual.out","w",stdout);
-    for (ll g=1; g<=3; ++g) {
+    puts("[Dual of Appollonian]");
+    for (ll g=1; g<=4; ++g) {
         VII hubs = dual.triples();
         for (ll k = 0; k <= 2; ++ k) {
             //printf("hubs: %lld %lld %lld\n",hubs[k][0],hubs[k][1],hubs[k][2]);
@@ -19,7 +19,16 @@ int main() {
         dual.set_hubs( {hubs[0][2], hubs[1][2], hubs[2][2]} );
 
         dual.push_node( dual.hubs );
-        dual.print();
+
+        PII size = dual.get_size();
+
+        printf("Generation %lld:\n", g);
+        printf("|V| = %lld, |E| = %lld, 2|E| = %lld\n",size.first,size.second/2,size.second);
+
+        PII ans  = dual.get_mds(22);
+
+        printf("|MDS| = %lld, # of MDSes = %lld\n\n", ans.first, ans.second);
+
         dual.pop_node();
     }
     return 0;

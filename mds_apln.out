@@ -1,0 +1,16 @@
+Generation 1:
+|V| = 4, |E| = 6, 2|E| = 12
+|MDS| = 1, # of MDSes = 4
+
+Generation 2:
+|V| = 7, |E| = 15, 2|E| = 30
+|MDS| = 1, # of MDSes = 1
+
+Generation 3:
+|V| = 16, |E| = 42, 2|E| = 84
+|MDS| = 3, # of MDSes = 11
+
+Generation 4:
+|V| = 43, |E| = 123, 2|E| = 246
+|MDS| = 4, # of MDSes = 1
+

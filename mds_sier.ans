@@ -1,0 +1,16 @@
+[Sier]
+Generation 1:
+|V| = 3, |E| = 3, 2|E| = 6
+|MDS| = 1, # of MDSes = 3
+
+Generation 2:
+|V| = 6, |E| = 9, 2|E| = 18
+|MDS| = 2, # of MDSes = 6
+
+Generation 3:
+|V| = 15, |E| = 27, 2|E| = 54
+|MDS| = 3, # of MDSes = 2
+
+Generation 4:
+|V| = 42, |E| = 81, 2|E| = 162
+|MDS| = 9, # of MDSes = 392

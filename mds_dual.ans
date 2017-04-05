@@ -1,0 +1,12 @@
+[Dual of Appollonian]
+Generation 1:
+|V| = 4, |E| = 6, 2|E| = 12
+|MDS| = 1, # of MDSes = 4
+
+Generation 2:
+|V| = 10, |E| = 15, 2|E| = 30
+|MDS| = 3, # of MDSes = 22
+
+Generation 3:
+|V| = 28, |E| = 42, 2|E| = 84
+|MDS| = 7, # of MDSes = 4
