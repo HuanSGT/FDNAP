@@ -45,6 +45,7 @@ struct network {
 
     void set_hubs(VI hubs_) {
         hubs = hubs_;
+        for (ll& i : hubs) i = getf(i);
     }
 
     void add_edge(ll i,ll j) { // sort the whold nbr[i],nbr[j] every time
@@ -114,7 +115,7 @@ struct network {
             ++ v;
             e += deg[i];
             printf("%lld\n",deg[i]);
-            //for (ll j : nbr[i]) printf("%lld %lld\n",i,getf(j));
+            for (ll j : nbr[i]) printf("%lld %lld\n",i,getf(j));
         }
         printf("|V| = %lld, 2|E| = %lld\n",v,e);
         puts("");
