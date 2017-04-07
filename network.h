@@ -10,6 +10,8 @@ typedef std :: vector<PII> VP;
 typedef std :: vector<ll> VI;
 typedef std :: vector<VI> VII;
 
+typedef std :: vector<bool> VB;
+
 template<ll maxn>
 struct network {
     ll n, m;
@@ -132,25 +134,53 @@ struct network {
 
     ll mds = n, way;
     bool in_ds[maxn];
+    ll nds;
 
-    PII get_mds(ll lower_bound = maxn) {
+    PII get_mds(ll lower_bound = maxn,ll del = 0, ll nds_ = -1) {
+        nds = nds_;
+
+        VI tmp_fa = {fa[hubs[0]], fa[hubs[1]], fa[hubs[2]]};
+        for (ll i = 0; i < del; ++i) fa[hubs[i]] = 0;
+
+
         mds = lower_bound; way = 0;
         for (ll i = 1; i <= n; ++i) in_ds[i] = false;
+
         dfs_mds(1,0);
+
+        for (ll i = 0; i < del; ++i) fa[hubs[i]] = tmp_fa[i];
+
         return {mds, way};
     }
 
     void dfs_mds(ll i,ll tot) {
         if (tot > mds) return;
         if (i > n) {
+            /*
+            VB tmp_in_ds = {in_ds[hubs[0]], in_ds[hubs[1]], in_ds[hubs[2]]};
+
+            printf("tot(%lld)\n",tot);
+            for (ll k = 0; k < 3; ++k) printf("(%lld,%lld)|",hubs[k],(ll)in_ds[hubs[k]]);
+            puts("");
+            if (nds >= 0) {
+                for (ll k = 0; k < nds; ++k) printf("(%lld,%lld)|",hubs[k],(ll)in_ds[hubs[k]]), tot += ll(!in_ds[hubs[k]]), in_ds[hubs[k]] = true;
+                for (ll k = nds; k < 3; ++k) printf("(%lld,%lld) ",hubs[k],(ll)in_ds[hubs[k]]), tot -= ll(in_ds[hubs[k]]), in_ds[hubs[k]] = false;
+                puts("");
+            }
+            printf("newtot(%lld)\n",tot);
+            */
+            bool yes = true;
             for (ll i = 1; i <= n; ++i) if (fa[i] == i && !in_ds[i]) {
                 bool flag = false;
                 for (ll j : nbr[i]) if (in_ds[j]) {
                     flag = true;
                     break;
                 }
-                if (!flag) return;
+                if (!flag) { yes = false; break; }
             }
+
+            //for (ll k = 0; k < 3; ++k) in_ds[hubs[k]] = tmp_in_ds[k];
+            if (!yes) return;
             //printf("DS: "); for (ll i = 1; i <= n; ++i) if (in_ds[i]) printf("%lld ",i); puts("");
             if (tot < mds) { mds = tot; way = 1; }
             else if (tot == mds) { ++ way; }
@@ -160,6 +190,17 @@ struct network {
             dfs_mds(i + 1, tot);
             return;
         }
+
+        if (nds >= 0 && std :: find(hubs.begin(),hubs.end(),i) != hubs.end()) {
+            if (std :: find(hubs.begin(),hubs.begin() + nds, i) != hubs.begin() + nds) {
+                in_ds[i] = true;
+                dfs_mds(i + 1, tot + 1);
+                in_ds[i] = false;
+            }
+            else dfs_mds(i + 1, tot);
+            return;
+        }
+
         dfs_mds(i + 1, tot);
 
         in_ds[i] = true;
