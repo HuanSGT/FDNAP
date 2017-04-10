@@ -1,6 +1,7 @@
 #include<cstdio>
 #include<vector>
 #include<algorithm>
+#include<cstring>
 
 typedef long long ll;
 
@@ -152,6 +153,7 @@ struct network {
     ll mlst, way_mlst, way_hubs[4], way_waist[4],dst[maxn];
     ll xmark, black;
     VP edges;
+    VI degn;
 
     ll nn,pa[maxn];
     ll getp(ll i) {
@@ -164,8 +166,10 @@ struct network {
             ll f0 = getp(reds[0]), f1 = getp(reds[1]);
             //if (f0 == f1) return;
             ll ln = 0, wn = 0, hn = 0;
+            VI dn(20,0);
             for (ll i = 1; i <= n; ++i) if (fa[i] == i) {
                 if (dst[i] == 1 && !occurs(i,hubs,black)) {
+                    ++dn[deg[i]];
                     ++ ln;
                     if (i == waist[0] || i == waist[1] || i == waist[2]) ++ wn;
                     if (i == hubs[0] || i == hubs[1] || i == hubs[2]) ++ hn;
@@ -178,11 +182,13 @@ struct network {
                 way_hubs[0] = way_hubs[1] = way_hubs[2] = way_hubs[3] = 0;
                 ++way_waist[wn];
                 ++way_hubs[hn];
+                for (ll k=0; k<20; ++k) degn[k] = dn[k];
             }
             else if (ln == mlst) {
                 ++ way_mlst;
                 ++way_waist[wn];
                 ++way_hubs[hn];
+                for (ll k=0; k<20; ++k) degn[k] += dn[k];
             }
             return;
         }
@@ -199,17 +205,23 @@ struct network {
 
     void print_mlst() {
 
-        for (xmark = 0; xmark < 3; ++ xmark) {
-            for (black = 0; black <= (xmark <= 1 ? 2 : 1); ++ black) {
+        for (xmark = 0; xmark < 2; ++ xmark) { // 3; ++ xmark) {
+            for (black = 0; black <= 0; ++black) { // black <= (xmark <= 1 ? 2 : 1); ++ black) {
 
                 edges = {};
                 nn = 0;
+                memset(deg,0,sizeof(deg));
                 for (ll i = 1; i <= n; ++i) if (fa[i] == i && !is_last(i,hubs,xmark)) {
                     dst[i] = 0;
                     ++ nn;
                     pa[i] = i;
-                    for (ll j : nbr[i]) if (j == fa[j] && !is_last(j,hubs,xmark) && i < j) edges.push_back({i,j});
+                    for (ll j : nbr[i]) if (j == fa[j] && !is_last(j,hubs,xmark) && i < j) {
+                        edges.push_back({i,j});
+                        printf("(%lld,%lld)\n",i,j);
+                        ++ deg[i]; ++ deg[j];
+                    }
                 }
+                for (ll i = 1; i <= n; ++i) if (fa[i] == i) { printf("%lld ",deg[i]); } puts("");
 
                 //for (PII e : edges) printf("(%lld,%lld)\n",e.first,e.second);
                 //printf("nn=%lld\n",nn);
@@ -218,12 +230,13 @@ struct network {
                 mlst = 0; way_mlst = 0;
                 way_waist[0] = way_waist[1] = way_waist[2] = way_waist[3] = 0;
                 way_hubs[0] = way_hubs[1] = way_hubs[2] = way_hubs[3] = 0;
+                degn = VI(20,0);
                 reds = {hubs[0],hubs[1]};
                 if (black) reds = {hubs[1],hubs[2]};
                 //reds = black == 0 ? {hubs[0],hubs[1]} : {hubs[1],hubs[2]};
                 dfs_mlst(edges.begin(), 0);
                 printf("[%lld %lld w(%lld,%lld,%lld,%lld) h(%lld,%lld,%lld,%lld)]] ",mlst,way_mlst,way_waist[0],way_waist[1],way_waist[2],way_waist[3],way_hubs[0],way_hubs[1],way_hubs[2],way_hubs[3]);
-
+                for (ll k = 0; k < 20; ++ k) printf("%lld ",degn[k]); puts("");
             }
             puts("");
         }
