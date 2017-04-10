@@ -12,12 +12,24 @@ typedef std :: vector<VI> VII;
 
 typedef std :: vector<bool> VB;
 
+typedef VI :: iterator it;
+typedef VP :: iterator it_p;
+
+bool occurs(ll x,VI& v,ll len) {
+    return std :: find(v.begin(),v.begin() + len,x) != v.begin() + len;
+}
+
+bool is_last(ll x,VI& v,ll len) {
+    return std :: find(v.end() - len,v.end(),x) != v.end();
+}
+
 template<ll maxn>
 struct network {
     ll n, m;
     ll deg[maxn];
     std :: vector<ll> nbr[maxn];
-    std :: vector<ll> hubs;
+    std :: vector<ll> hubs,waist;
+    std :: vector<ll> reds;
 
     ll fa[maxn]; //Disjoint-set; for merging two nodes
     ll getf(ll i) {
@@ -31,7 +43,7 @@ struct network {
         deg[i] = nbr[i].size();
     }
 
-    network(ll n_ = 0, VP edges = {}, VI hubs_ = {}): n(n_), hubs(hubs_) {
+    network(ll n_ = 0, VP edges = {}, VI hubs_ = {}, VI waist_ = {}): n(n_), hubs(hubs_),waist(waist_) {
         for (ll i = 1; i <= n; ++i ) {
             fa[i] = i; deg[i] = 0;
         }
@@ -48,6 +60,11 @@ struct network {
     void set_hubs(VI hubs_) {
         hubs = hubs_;
         for (ll& i : hubs) i = getf(i);
+    }
+
+    void set_waist(VI waist_) {
+        waist = waist_;
+        for (ll& i : waist) i = getf(i);
     }
 
     void add_edge(ll i,ll j) { // sort the whold nbr[i],nbr[j] every time
@@ -132,6 +149,86 @@ struct network {
         puts("");
     }
 
+    ll mlst, way_mlst, way_hubs[4], way_waist[4],dst[maxn];
+    ll xmark, black;
+    VP edges;
+
+    ll nn,pa[maxn];
+    ll getp(ll i) {
+        return i == pa[i] ? i : getp(pa[i]);
+    }
+
+    void dfs_mlst(it_p e, ll en) {
+        if (e == edges.end()) {
+            if (en != nn - 1) return;
+            ll f0 = getp(reds[0]), f1 = getp(reds[1]);
+            //if (f0 == f1) return;
+            ll ln = 0, wn = 0, hn = 0;
+            for (ll i = 1; i <= n; ++i) if (fa[i] == i) {
+                if (dst[i] == 1 && !occurs(i,hubs,black)) {
+                    ++ ln;
+                    if (i == waist[0] || i == waist[1] || i == waist[2]) ++ wn;
+                    if (i == hubs[0] || i == hubs[1] || i == hubs[2]) ++ hn;
+                }
+            }
+            //for (ll k = 0; k < black; ++ k) if (dst[hubs[k]] == 1) -- ln;
+            if (ln > mlst) {
+                mlst = ln; way_mlst = 1;
+                way_waist[0] = way_waist[1] = way_waist[2] = way_waist[3] = 0;
+                way_hubs[0] = way_hubs[1] = way_hubs[2] = way_hubs[3] = 0;
+                ++way_waist[wn];
+                ++way_hubs[hn];
+            }
+            else if (ln == mlst) {
+                ++ way_mlst;
+                ++way_waist[wn];
+                ++way_hubs[hn];
+            }
+            return;
+        }
+        ll i = e->first, j = e->second, pi = getp(i), pj = getp(j), tmp;
+        if (edges.end() - e - 1 + en >= nn - 1) dfs_mlst(e+1,en);
+        if (en < nn - 1 && pi != pj) {
+            tmp = pa[pj]; pa[pj] = pi;
+            ++dst[i]; ++dst[j];
+            dfs_mlst(e + 1, en + 1);
+            --dst[i]; --dst[j];
+            pa[pj] = tmp;
+        }
+    }
+
+    void print_mlst() {
+
+        for (xmark = 0; xmark < 3; ++ xmark) {
+            for (black = 0; black <= (xmark <= 1 ? 2 : 1); ++ black) {
+
+                edges = {};
+                nn = 0;
+                for (ll i = 1; i <= n; ++i) if (fa[i] == i && !is_last(i,hubs,xmark)) {
+                    dst[i] = 0;
+                    ++ nn;
+                    pa[i] = i;
+                    for (ll j : nbr[i]) if (j == fa[j] && !is_last(j,hubs,xmark) && i < j) edges.push_back({i,j});
+                }
+
+                //for (PII e : edges) printf("(%lld,%lld)\n",e.first,e.second);
+                //printf("nn=%lld\n",nn);
+                nn;
+
+                mlst = 0; way_mlst = 0;
+                way_waist[0] = way_waist[1] = way_waist[2] = way_waist[3] = 0;
+                way_hubs[0] = way_hubs[1] = way_hubs[2] = way_hubs[3] = 0;
+                reds = {hubs[0],hubs[1]};
+                if (black) reds = {hubs[1],hubs[2]};
+                //reds = black == 0 ? {hubs[0],hubs[1]} : {hubs[1],hubs[2]};
+                dfs_mlst(edges.begin(), 0);
+                printf("[%lld %lld w(%lld,%lld,%lld,%lld) h(%lld,%lld,%lld,%lld)]] ",mlst,way_mlst,way_waist[0],way_waist[1],way_waist[2],way_waist[3],way_hubs[0],way_hubs[1],way_hubs[2],way_hubs[3]);
+
+            }
+            puts("");
+        }
+    }
+
     ll mds = n, way;
     bool in_ds[maxn];
     ll nds;
@@ -156,19 +253,6 @@ struct network {
     void dfs_mds(ll i,ll tot) {
         if (tot > mds) return;
         if (i > n) {
-            /*
-            VB tmp_in_ds = {in_ds[hubs[0]], in_ds[hubs[1]], in_ds[hubs[2]]};
-
-            printf("tot(%lld)\n",tot);
-            for (ll k = 0; k < 3; ++k) printf("(%lld,%lld)|",hubs[k],(ll)in_ds[hubs[k]]);
-            puts("");
-            if (nds >= 0) {
-                for (ll k = 0; k < nds; ++k) printf("(%lld,%lld)|",hubs[k],(ll)in_ds[hubs[k]]), tot += ll(!in_ds[hubs[k]]), in_ds[hubs[k]] = true;
-                for (ll k = nds; k < 3; ++k) printf("(%lld,%lld) ",hubs[k],(ll)in_ds[hubs[k]]), tot -= ll(in_ds[hubs[k]]), in_ds[hubs[k]] = false;
-                puts("");
-            }
-            printf("newtot(%lld)\n",tot);
-            */
             bool yes = true;
             for (ll i = 1; i <= n; ++i) if (fa[i] == i && !in_ds[i]) {
                 bool flag = false;
@@ -179,9 +263,7 @@ struct network {
                 if (!flag) { yes = false; break; }
             }
 
-            //for (ll k = 0; k < 3; ++k) in_ds[hubs[k]] = tmp_in_ds[k];
             if (!yes) return;
-            //printf("DS: "); for (ll i = 1; i <= n; ++i) if (in_ds[i]) printf("%lld ",i); puts("");
             if (tot < mds) { mds = tot; way = 1; }
             else if (tot == mds) { ++ way; }
             return;
