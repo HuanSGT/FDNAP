@@ -6,6 +6,8 @@
 
 network<1000> dual(1,{}, {1,1,1});
 
+PII ans;
+
 int main() {
     puts("[Dual of Appollonian]\n");
     for (ll g=1; g<=3; ++g) {
@@ -25,27 +27,28 @@ int main() {
         printf("Generation %lld:\n\n", g);
         printf("|V| = %lld, |E| = %lld, 2|E| = %lld\n\n",size.first,size.second/2,size.second);
 
-        PII ans  = dual.get_mds(22);
+        ans  = dual.get_mds(22);
 
         printf("|MDS| = %lld, # of MDSes = %lld\n\n", ans.first, ans.second);
 
         dual.pop_node();
 
+        /*
         ans  = dual.get_mds(22);
 
         printf("|MDS with external node removed| = %lld, # of those MDSes = %lld\n\n", ans.first, ans.second);
 
-        /*
         for (ll del = 1; del <= 3; ++ del) {
             PII ans  = dual.get_mds(22, del);
             printf("|MDS with %lld hubs and external node removed| = %lld, # of those MDSes = %lld\n\n", del, ans.first, ans.second);
         }
-        */
 
         for (ll nds_ = 0; nds_ <= 3; ++ nds_) {
             PII ans  = dual.get_mds(25, 0, nds_);
             printf("|MDS containing exact %lld hubs, with external node removed | = %lld, # of those MDSes = %lld\n\n", nds_, ans.first, ans.second);
         }
+        */
+
         puts("");
 
     }

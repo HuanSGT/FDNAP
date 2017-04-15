@@ -150,6 +150,23 @@ struct network {
         puts("");
     }
 
+    ll match, way_match, del_match;
+    bool matched[maxn];
+
+    void get_match(ll upper_bound = 0, ll del = 0) {
+        del_match = del;
+
+        VI tmp_fa = {fa[hubs[0]], fa[hubs[1]], fa[hubs[2]]};
+        for (ll i = 0; i < del; ++i) fa[hubs[i]] = 0;
+
+        match = upper_bound; way_match = 0;
+        for (ll i = 1; i <= n; ++i) in_ds[i] = false;
+
+        dfs_match(1,0);
+
+        for (ll i = 0; i < del; ++i) fa[hubs[i]] = tmp_fa[i];
+    }
+
     ll mlst, way_mlst, way_hubs[4], way_waist[4],dst[maxn];
     ll xmark, black;
     VP edges;

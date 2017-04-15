@@ -5,6 +5,7 @@
 #include"network.h"
 
 network<1000> apln(3,{{1,2},{1,3},{2,3}}, {1,2,3});
+PII ans;
 
 int main() {
     puts("[Appollonian]\n");
@@ -24,7 +25,8 @@ int main() {
         printf("Generation %lld:\n", g);
         printf("|V| = %lld, |E| = %lld, 2|E| = %lld\n",size.first,size.second/2,size.second);
 
-        PII ans  = apln.get_mds(6);
+        /*
+        ans  = apln.get_mds(6);
 
         printf("|MDS| = %lld, # of MDSes = %lld\n\n", ans.first, ans.second);
 
@@ -39,6 +41,8 @@ int main() {
             PII ans  = apln.get_mds(7, 0, nds_);
             printf("|MDS containing exact %lld hubs| = %lld, # of those MDSes = %lld\n\n", nds_, ans.first, ans.second);
         }
+        */
+
         puts("");
     }
     return 0;
