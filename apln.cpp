@@ -9,7 +9,7 @@ PII ans;
 
 int main() {
     puts("[Appollonian]\n");
-    for (ll g=1; g<=4; ++g) {
+    for (ll g=1; g<=3; ++g) {
         VII hubs = apln.triples();
         for (ll k = 0; k <= 2; ++ k) {
             //printf("hubs: %lld %lld %lld\n",hubs[k][0],hubs[k][1],hubs[k][2]);
@@ -24,6 +24,16 @@ int main() {
 
         printf("Generation %lld:\n", g);
         printf("|V| = %lld, |E| = %lld, 2|E| = %lld\n",size.first,size.second/2,size.second);
+
+        //ll upper_bound = g < 4 ? 0 : 16;
+
+        ans  = apln.get_match(0, -1);
+        printf("|maximum maching| = %lld, # of those matchings = %lld\n\n", ans.first, ans.second);
+
+        for (ll im = 0; im <= 3; ++ im) {
+            ans  = apln.get_match(0, im);
+            printf("|maximum maching containing %lld hubs| = %lld, # of those matchings = %lld\n\n", im, ans.first, ans.second);
+        }
 
         /*
         ans  = apln.get_mds(6);

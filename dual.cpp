@@ -27,11 +27,26 @@ int main() {
         printf("Generation %lld:\n\n", g);
         printf("|V| = %lld, |E| = %lld, 2|E| = %lld\n\n",size.first,size.second/2,size.second);
 
+        ll upper_bound = 0;
+
+        ans  = dual.get_match(0, -1);
+        printf("|maximum maching| = %lld, # of those matchings = %lld\n\n", ans.first, ans.second);
+
+        /*
         ans  = dual.get_mds(22);
 
         printf("|MDS| = %lld, # of MDSes = %lld\n\n", ans.first, ans.second);
+        */
 
         dual.pop_node();
+
+        ans  = dual.get_match(0, -1);
+        printf("|maximum maching with external node removed| = %lld, # of those matchings = %lld\n\n", ans.first, ans.second);
+
+        for (ll im = 0; im <= 3; ++ im) {
+            ans  = dual.get_match(0, im);
+            printf("|maximum maching containing %lld hubs with external node removed| = %lld, # of those matchings = %lld\n\n", im, ans.first, ans.second);
+        }
 
         /*
         ans  = dual.get_mds(22);

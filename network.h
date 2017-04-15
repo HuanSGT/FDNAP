@@ -152,19 +152,51 @@ struct network {
 
     ll match, way_match, del_match;
     bool matched[maxn];
+    ll in_match[maxn];
 
-    void get_match(ll upper_bound = 0, ll del = 0) {
-        del_match = del;
+    PII get_match(ll upper_bound = 0, ll im = -1) {
 
-        VI tmp_fa = {fa[hubs[0]], fa[hubs[1]], fa[hubs[2]]};
-        for (ll i = 0; i < del; ++i) fa[hubs[i]] = 0;
+        //VI tmp_fa = {fa[hubs[0]], fa[hubs[1]], fa[hubs[2]]};
+        //for (ll i = 0; i < del; ++i) fa[hubs[i]] = 0;
 
         match = upper_bound; way_match = 0;
-        for (ll i = 1; i <= n; ++i) in_ds[i] = false;
+        for (ll i = 1; i <= n; ++i) matched[i] = false, in_match[i] = 0;
+
+        if (im >= 0) {
+            for (ll i = 0; i < im; ++i) in_match[hubs[i]] = 1;
+            for (ll i = im; i < 3; ++i) in_match[hubs[i]] = -1;
+        }
 
         dfs_match(1,0);
 
-        for (ll i = 0; i < del; ++i) fa[hubs[i]] = tmp_fa[i];
+        for (ll i = 0; i < 3; ++i) in_match[hubs[i]] = 0;
+
+        ///for (ll i = 0; i < del; ++i) fa[hubs[i]] = tmp_fa[i];
+        
+        return {match, way_match};
+    }
+
+    void dfs_match(ll i, ll tot) {
+        //if (n - i + 1 + tot < match) return;
+        if (i > n) {
+            for (ll k = 1; k <= n; ++k) if ((in_match[k] == 1 && !matched[k]) || (in_match[k] == -1 && matched[k])) return;
+            if (tot > match) { match = tot; way_match = 1; }
+            else if (tot == match) { ++ way_match; }
+            return;
+        }
+        if (fa[i] != i || matched[i]) {
+            dfs_match(i + 1, tot);
+            return;
+        }
+        //if (in_match[i] >= 0) {
+            for (ll j : nbr[i]) if (i < j && fa[j] == j && !matched[j] && in_match[j] >= 0) {
+                matched[i] = matched[j] = true;
+                dfs_match(i + 1, tot + 1);
+                matched[i] = matched[j] = false;
+            }
+        //}
+        //if (in_match[i] <= 0)
+        dfs_match(i + 1, tot);
     }
 
     ll mlst, way_mlst, way_hubs[4], way_waist[4],dst[maxn];
